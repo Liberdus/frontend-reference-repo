@@ -105,7 +105,7 @@
     flex-wrap: nowrap;
     gap: 8px;
     padding: 10px var(--container-padding);
-    align-items: flex-start;
+    align-items: center;
   }
 
   .header-toolbar > .logo-link {
@@ -144,14 +144,18 @@
 
   .nav-section {
     flex-shrink: 0;
-    align-self: flex-start;
-    margin-top: 2px;
+    align-self: center;
+    margin-top: 0;
+    min-width: 0;
   }
 
   .connect-wallet-btn {
-    padding: 8px 12px;
-    font-size: var(--font-size-sm);
+    padding: 6px 10px;
+    font-size: var(--font-size-xs);
+    max-width: 40vw;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     flex-shrink: 0;
   }
 }
