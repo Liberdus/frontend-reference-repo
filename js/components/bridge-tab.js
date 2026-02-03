@@ -327,6 +327,7 @@ export class BridgeTab {
       });
 
       await tx.wait();
+      contractManager?.invalidateParametersCache?.({ notify: true });
 
       const explorer = CONFIG?.NETWORK?.BLOCK_EXPLORER || 'https://polygonscan.com';
       toast?.update?.(loadingId, {

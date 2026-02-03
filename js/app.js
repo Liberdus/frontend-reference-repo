@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   walletPopup.load();
   await contractManager.load();
   
-  // Pre-fetch parameters to ensure symbol is available for components
-  contractManager.getParametersBatch?.().catch(() => {});
+  // Pre-fetch parameters before tabs mount so symbol-dependent labels render correctly.
+  await contractManager.getParametersBatch?.().catch(() => {});
 
   header.load();
   proposalDetailModal.load();

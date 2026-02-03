@@ -581,6 +581,7 @@ export class ProposeTab {
       }
 
       const receipt = await tx.wait();
+      contractManager?.invalidateParametersCache?.({ notify: true });
 
       // Try to extract operationId from OperationRequested event in receipt.
       let opId = null;

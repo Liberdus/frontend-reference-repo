@@ -158,6 +158,7 @@ export class ProposalDetailModal {
       this.signBtn.textContent = 'Confirming…';
 
       await tx.wait();
+      contractManager?.invalidateParametersCache?.({ notify: true });
 
       // Refresh details in modal
       const detailsMap = await contractManager.getOperationsBatch([opId]);

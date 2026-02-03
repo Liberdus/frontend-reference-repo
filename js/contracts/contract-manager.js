@@ -38,7 +38,11 @@ export class ContractManager {
 
   load() {
     if (this._loadPromise) return this._loadPromise;
-    this._loadPromise = this._load();
+    this._loadPromise = this._load().catch((error) => {
+      // Allow callers to retry after transient startup failures (RPC/ABI/network).
+      this._loadPromise = null;
+      throw error;
+    });
     return this._loadPromise;
   }
 
@@ -100,19 +104,32 @@ export class ContractManager {
     }
 
     // Clear cached batched reads on connection changes.
-    this._parametersBatchPromise = null;
-    this._parametersCache = null;
-    this._parametersCacheAt = 0;
+    this.invalidateParametersCache({ notify: false });
 
+    this._emitUpdatedEvent({ txEnabled, reason: 'connectionsChanged' });
+  }
+
+  _emitUpdatedEvent({ txEnabled = !!this.networkManager?.isTxEnabled?.(), reason = 'updated' } = {}) {
     document.dispatchEvent(
       new CustomEvent('contractManagerUpdated', {
         detail: {
+          reason,
           txEnabled,
           address: CONFIG.CONTRACT.ADDRESS,
           chainId: CONFIG.NETWORK.CHAIN_ID,
         },
       })
     );
+  }
+
+  invalidateParametersCache({ notify = false } = {}) {
+    this._parametersBatchPromise = null;
+    this._parametersCache = null;
+    this._parametersCacheAt = 0;
+
+    if (notify) {
+      this._emitUpdatedEvent({ reason: 'cacheInvalidated' });
+    }
   }
 
   _makeContract(signerOrProvider) {
