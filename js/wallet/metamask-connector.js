@@ -159,25 +159,6 @@ export class MetaMaskConnector {
     return this._hexToNumber(chainIdHex);
   }
 
-  async switchNetwork(chainId) {
-    const walletProvider = await this.getEip1193Provider({ waitMs: 200 });
-    if (!walletProvider) throw new Error('No wallet provider available');
-    const hexChainId = this._numberToHex(chainId);
-    await walletProvider.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: hexChainId }],
-    });
-  }
-
-  async addNetwork(networkConfig) {
-    const walletProvider = await this.getEip1193Provider({ waitMs: 200 });
-    if (!walletProvider) throw new Error('MetaMask is not installed');
-    await walletProvider.request({
-      method: 'wallet_addEthereumChain',
-      params: [networkConfig],
-    });
-  }
-
   getAccount() {
     return this.account;
   }
@@ -251,10 +232,6 @@ export class MetaMaskConnector {
     } catch {
       return null;
     }
-  }
-
-  _numberToHex(num) {
-    return '0x' + Number(num).toString(16);
   }
 
   _refreshLegacyFallbackProvider() {
