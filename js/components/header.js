@@ -31,7 +31,7 @@ export class Header {
     const walletPopup = window.walletPopup;
 
     // No MetaMask
-    if (!window.ethereum || !window.ethereum.isMetaMask) {
+    if (!walletManager?.hasAvailableWallet?.()) {
       window.alert('MetaMask is required for this app (Phase 2).');
       return;
     }
@@ -53,7 +53,13 @@ export class Header {
       try {
         await networkManager.ensurePolygonNetwork();
       } catch (e) {
-        window.alert('Please connect to Polygon in MetaMask.');
+        if (e?.code === 4001) {
+          window.alert('Network switch request was rejected.');
+        } else if (e?.code === -32002) {
+          window.alert('Network switch request already pending in MetaMask.');
+        } else {
+          window.alert('Please connect to Polygon in MetaMask.');
+        }
       } finally {
         this.updateConnectButtonStatus();
       }
@@ -66,7 +72,13 @@ export class Header {
       await walletManager?.connectMetaMask?.();
       // If connected but wrong network, keep simple: user can click again to switch.
     } catch (e) {
-      window.alert(e?.message || 'Failed to connect wallet');
+      if (e?.code === 4001) {
+        window.alert('Connection request was rejected.');
+      } else if (e?.code === -32002) {
+        window.alert('Connection request already pending in MetaMask.');
+      } else {
+        window.alert(e?.message || 'Failed to connect wallet');
+      }
     } finally {
       this.updateConnectButtonStatus();
     }
@@ -79,7 +91,7 @@ export class Header {
     if (!this.connectWalletBtn) return;
 
     // MetaMask not installed
-    if (!window.ethereum || !window.ethereum.isMetaMask) {
+    if (!walletManager?.hasAvailableWallet?.()) {
       this.renderConnectButton({ text: 'Install MetaMask', disabled: false });
       return;
     }
@@ -116,4 +128,3 @@ export class Header {
     btn.classList.toggle('is-connected', !!connected);
   }
 }
-

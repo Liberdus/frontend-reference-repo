@@ -103,6 +103,17 @@
             >
               Parameters
             </button>
+            <button
+              class="tab-button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="tab-panel-design-guide"
+              id="tab-design-guide"
+              data-tab="design-guide"
+              type="button"
+            >
+              Design Guide
+            </button>
           </div>
 
           <div class="tab-panels">
@@ -152,6 +163,18 @@
             >
               <!-- Filled by js/components/parameters-tab.js -->
             </section>
+
+            <section
+              class="tab-panel"
+              id="tab-panel-design-guide"
+              role="tabpanel"
+              aria-labelledby="tab-design-guide"
+              tabindex="0"
+              hidden
+              data-panel="design-guide"
+            >
+              <!-- Filled by js/components/design-guide-tab.js -->
+            </section>
           </div>
         </section>
       </main>
@@ -179,4 +202,3 @@
     <div id="wallet-popup-container"></div>
   </body>
 </html>
-

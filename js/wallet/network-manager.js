@@ -45,10 +45,11 @@ export class NetworkManager {
   }
 
   async ensurePolygonNetwork() {
-    if (!window.ethereum) throw new Error('MetaMask not available');
+    const walletProvider = await this.walletManager?.getEip1193Provider?.({ waitMs: 200 });
+    if (!walletProvider) throw new Error('MetaMask not available');
     // Try switching; if missing, add then switch.
     try {
-      await window.ethereum.request({
+      await walletProvider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: this.requiredChainHex }],
       });
@@ -56,7 +57,7 @@ export class NetworkManager {
     } catch (error) {
       if (error && error.code === 4902) {
         await this.addPolygonNetwork();
-        await window.ethereum.request({
+        await walletProvider.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: this.requiredChainHex }],
         });
@@ -67,8 +68,10 @@ export class NetworkManager {
   }
 
   async addPolygonNetwork() {
+    const walletProvider = await this.walletManager?.getEip1193Provider?.({ waitMs: 200 });
+    if (!walletProvider) throw new Error('MetaMask not available');
     const networkConfig = this.buildPolygonNetworkConfig();
-    await window.ethereum.request({
+    await walletProvider.request({
       method: 'wallet_addEthereumChain',
       params: [networkConfig],
     });
@@ -114,4 +117,3 @@ export class NetworkManager {
     return '0x' + Number(chainId).toString(16);
   }
 }
-

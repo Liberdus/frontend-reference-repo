@@ -63,7 +63,7 @@ This file summarizes the core implementation patterns in this repo so it can be 
 
 ### Layered wallet architecture
 - Files: `js/wallet/metamask-connector.js`, `js/wallet/wallet-manager.js`, `js/wallet/network-manager.js`
-- `MetaMaskConnector`: low-level EIP-1193/MetaMask interactions.
+- `MetaMaskConnector`: low-level EIP-1193/MetaMask interactions with EIP-6963-first provider discovery and legacy fallback.
 - `WalletManager`: app-level wallet state (provider, signer, address, chain), connect/disconnect, restoration, event dispatch.
 - `NetworkManager`: Polygon network requirements and tx gating.
 
@@ -71,6 +71,7 @@ This file summarizes the core implementation patterns in this repo so it can be 
 - File: `js/wallet/wallet-manager.js`
 - Last wallet connection metadata is stored in localStorage (`liberdus_token_ui_wallet_connection`).
 - On startup, `checkPreviousConnection()` attempts non-interactive restore via `eth_accounts`.
+- Restore and network switch calls use the resolved EIP-1193 provider (not hard-wired `window.ethereum`).
 
 ### Event-driven sync
 - Files: `js/wallet/wallet-manager.js`, `js/contracts/contract-manager.js`, `js/components/header.js`, `js/wallet/wallet-popup.js`

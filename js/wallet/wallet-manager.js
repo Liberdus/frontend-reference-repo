@@ -66,6 +66,18 @@ export class WalletManager {
     return this.signer;
   }
 
+  hasAvailableWallet() {
+    return !!this.connector?.isAvailable?.();
+  }
+
+  async getEip1193Provider(options = {}) {
+    return await this.connector?.getEip1193Provider?.(options);
+  }
+
+  peekEip1193Provider() {
+    return this.connector?.peekEip1193Provider?.() || null;
+  }
+
   subscribe(callback) {
     this.listeners.add(callback);
     return () => this.listeners.delete(callback);
@@ -114,16 +126,8 @@ export class WalletManager {
   }
 
   async disconnect() {
-    await this.connector.disconnect();
-
-    this.provider = null;
-    this.signer = null;
-    this.address = null;
-    this.chainId = null;
-    this.walletType = null;
-
-    this._clearConnectionInfo();
-    this._notify('disconnected', {});
+    await this.connector.disconnect({ revokePermissions: true });
+    this._clearStateAndNotifyDisconnect();
   }
 
   async checkPreviousConnection() {
@@ -139,6 +143,9 @@ export class WalletManager {
     if (!stored?.address) return false;
 
     try {
+      const eip1193Provider = await this.getEip1193Provider({ waitMs: 200 });
+      if (!eip1193Provider) return false;
+
       const accounts = await this.connector.getAccounts(); // does not prompt
       if (!accounts || accounts.length === 0) {
         this._clearConnectionInfo();
@@ -155,7 +162,7 @@ export class WalletManager {
         return false;
       }
 
-      this.provider = new window.ethers.providers.Web3Provider(window.ethereum);
+      this.provider = new window.ethers.providers.Web3Provider(eip1193Provider);
       this.signer = this.provider.getSigner();
       this.address = addr;
 
@@ -188,7 +195,7 @@ export class WalletManager {
 
   _handleAccountsChanged(accounts) {
     if (!accounts || accounts.length === 0) {
-      this.disconnect().catch(() => {});
+      this._clearStateAndNotifyDisconnect();
       return;
     }
     this.address = accounts[0];
@@ -203,7 +210,7 @@ export class WalletManager {
   }
 
   _handleDisconnected() {
-    this.disconnect().catch(() => {});
+    this._clearStateAndNotifyDisconnect();
   }
 
   _notify(event, data) {
@@ -249,5 +256,15 @@ export class WalletManager {
       // ignore
     }
   }
-}
 
+  _clearStateAndNotifyDisconnect() {
+    this.provider = null;
+    this.signer = null;
+    this.address = null;
+    this.chainId = null;
+    this.walletType = null;
+
+    this._clearConnectionInfo();
+    this._notify('disconnected', {});
+  }
+}

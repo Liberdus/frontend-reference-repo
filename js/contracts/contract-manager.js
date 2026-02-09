@@ -161,12 +161,13 @@ export class ContractManager {
 
   getWriteContract() {
     const txEnabled = !!this.networkManager?.isTxEnabled?.();
-    if (!txEnabled || !window.ethereum || !window.ethers) {
+    const eip1193Provider = this.walletManager?.peekEip1193Provider?.() || null;
+    if (!txEnabled || !eip1193Provider || !window.ethers) {
       return this.contractWrite;
     }
 
     // Create a fresh provider/signer for each write to avoid stale network caching.
-    const freshProvider = new window.ethers.providers.Web3Provider(window.ethereum, 'any');
+    const freshProvider = new window.ethers.providers.Web3Provider(eip1193Provider, 'any');
     const freshSigner = freshProvider.getSigner();
     return this._makeContract(freshSigner);
   }
@@ -575,4 +576,3 @@ async function mapWithConcurrencySettled(items, concurrency, fn) {
   await Promise.all(workers);
   return results;
 }
-

@@ -5,6 +5,7 @@ import { ProposalsTab } from './components/proposals-tab.js';
 import { ProposeTab } from './components/propose-tab.js';
 import { BridgeTab } from './components/bridge-tab.js';
 import { ParametersTab } from './components/parameters-tab.js';
+import { DesignGuideTab } from './components/design-guide-tab.js';
 import { ProposalDetailModal } from './components/proposal-detail-modal.js';
 import { ToastManager } from './components/toast-manager.js';
 import { WalletManager } from './wallet/wallet-manager.js';
@@ -19,6 +20,7 @@ const proposalsTab = new ProposalsTab();
 const proposeTab = new ProposeTab();
 const bridgeTab = new BridgeTab();
 const parametersTab = new ParametersTab();
+const designGuideTab = new DesignGuideTab();
 const proposalDetailModal = new ProposalDetailModal();
 const toastManager = new ToastManager();
 const walletManager = new WalletManager();
@@ -62,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   proposeTab.load();
   bridgeTab.load();
   parametersTab.load();
+  designGuideTab.load();
 
   // Load TabBar last so the initial `tabActivated` event
   // is received by all tab components (lazy tab loading).
@@ -78,4 +81,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
-
